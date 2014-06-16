@@ -223,9 +223,9 @@ prompt_time() {
 }
 
 prompt_rubyversion() {
-  if [[ -f $HOME/.rbenv ]]; then
+  if [[ -d $HOME/.rbenv ]]; then
     rubyversion='$(rbenv version | sed -e "s/ (set.*$//")'
-  elif [[ -f $HOME/.rvm ]]; then
+  elif [[ -d $HOME/.rvm ]]; then
     rubyversion='$(rvm current 2>/dev/null)'
   else
     rubyversion='$(ruby -v)'
