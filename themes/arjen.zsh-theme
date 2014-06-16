@@ -49,7 +49,6 @@ prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
     echo -n " %{%k%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR"
   else
-    echo 'here'
     echo -n "%{%k%}"
   fi
   echo -n "%{%f%}"
