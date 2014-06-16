@@ -55,6 +55,21 @@ prompt_end() {
   CURRENT_BG=''
 }
 
+# End the prompt, closing any open segments
+prompt_line_end() {
+  if [[ -n $CURRENT_BG ]]; then
+    if [[ $CURRENT_BG == 'NONE' ]]; then
+      echo -n " %{%k%F{black}%}$SEGMENT_SEPARATOR"
+    else
+      echo -n " %{%k%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR"
+    fi
+  else
+    echo -n "%{%k%}"
+  fi
+  echo -n "%{%f%}"
+  CURRENT_BG=''
+}
+
 ### Prompt components
 # Each component will draw itself, and hide itself if no information needs to be shown
 
@@ -178,8 +193,8 @@ build_prompt2() {
   RETVAL=$?
   prompt_status
   prompt_git
-  prompt_hg
-  prompt_end
+  # prompt_hg
+  prompt_line_end
 }
 
 build_rprompt() {
