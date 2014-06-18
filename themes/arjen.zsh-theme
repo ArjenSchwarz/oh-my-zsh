@@ -228,7 +228,7 @@ prompt_rubyversion() {
   elif [[ -d $HOME/.rvm ]]; then
     rubyversion='$(rvm current 2>/dev/null)'
   else
-    rubyversion='$(ruby -v)'
+    rubyversion=''
   fi
   prompt_segment black default "${rubyversion}"
 }
