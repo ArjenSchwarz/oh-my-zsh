@@ -1,9 +1,11 @@
 # vim:ft=zsh ts=2 sw=2 sts=2
 #
-# agnoster's Theme - https://gist.github.com/3712874
+# Arjen's Theme
 # A Powerline-inspired theme for ZSH
 #
 # # README
+#
+# Based on agnoster's Theme - https://gist.github.com/3712874
 #
 # In order for this theme to render correctly, you will need a
 # [Powerline-patched font](https://github.com/Lokaltog/powerline-fonts).
@@ -21,6 +23,7 @@
 # hostname to whether the last call exited with an error to whether background
 # jobs are running in this shell will all be displayed automatically when
 # appropriate.
+# It also shows timestamps as well as the ruby version when using rbenv or rvm.
 
 ### Segment drawing
 # A few utility functions to make it easy and re-usable to draw segmented prompts
@@ -119,41 +122,6 @@ prompt_git() {
   fi
 }
 
-prompt_hg() {
-  local rev status
-  if $(hg id >/dev/null 2>&1); then
-    if $(hg prompt >/dev/null 2>&1); then
-      if [[ $(hg prompt "{status|unknown}") = "?" ]]; then
-        # if files are not added
-        prompt_segment red white
-        st='±'
-      elif [[ -n $(hg prompt "{status|modified}") ]]; then
-        # if any modification
-        prompt_segment yellow black
-        st='±'
-      else
-        # if working copy is clean
-        prompt_segment green black
-      fi
-      echo -n $(hg prompt "☿ {rev}@{branch}") $st
-    else
-      st=""
-      rev=$(hg id -n 2>/dev/null | sed 's/[^-0-9]//g')
-      branch=$(hg id -b 2>/dev/null)
-      if `hg st | grep -Eq "^\?"`; then
-        prompt_segment red black
-        st='±'
-      elif `hg st | grep -Eq "^(M|A)"`; then
-        prompt_segment yellow black
-        st='±'
-      else
-        prompt_segment green black
-      fi
-      echo -n "☿ $rev@$branch" $st
-    fi
-  fi
-}
-
 # Dir: current working directory
 prompt_dir() {
   prompt_segment blue black '%~'
@@ -181,27 +149,49 @@ prompt_status() {
   [[ -n "$symbols" ]] && prompt_segment black default "$symbols"
 }
 
-## Main prompt
-build_prompt() {
+# Show the current time
+prompt_time() {
+  prompt_segment blue black "%*"
+}
+
+# Show the ruby version when
+# - running rbenv
+# - running rvm
+prompt_rubyversion() {
+  if [[ -d $HOME/.rbenv ]]; then
+    rubyversion='$(rbenv version | sed -e "s/ (set.*$//")'
+  elif [[ -d $HOME/.rvm ]]; then
+    rubyversion='$(rvm current 2>/dev/null)'
+  else
+    rubyversion=''
+  fi
+  prompt_segment black default "${rubyversion}"
+}
+
+## Left hand upper prompt
+build_prompt_left_upper() {
   prompt_virtualenv
   prompt_context
   prompt_dir
   prompt_end
 }
 
-build_prompt2() {
-  RETVAL=$?
-  prompt_status
-  prompt_git
-  # prompt_hg
-  prompt_line_end
-}
-
-build_rprompt() {
+## Right hand upper part of prompt
+build_prompt_right_upper() {
   prompt_time
   prompt_rubyversion
   prompt_end
 }
+
+## Left hand, main prompt
+build_prompt_left_lower() {
+  RETVAL=$?
+  prompt_status
+  prompt_git
+  prompt_line_end
+}
+
+# Section taken from bureau theme
 
 get_space () {
   local STR=$1$2
@@ -218,23 +208,8 @@ get_space () {
   echo $SPACES
 }
 
-prompt_time() {
-  prompt_segment blue black "[%*]"
-}
-
-prompt_rubyversion() {
-  if [[ -d $HOME/.rbenv ]]; then
-    rubyversion='$(rbenv version | sed -e "s/ (set.*$//")'
-  elif [[ -d $HOME/.rvm ]]; then
-    rubyversion='$(rvm current 2>/dev/null)'
-  else
-    rubyversion=''
-  fi
-  prompt_segment black default "${rubyversion}"
-}
-
-_1LEFT="%{%f%b%k%}$(build_prompt)"
-_1RIGHT="%{%f%b%k%}$(build_rprompt)"
+_1LEFT="%{%f%b%k%}$(build_prompt_left_upper)"
+_1RIGHT="%{%f%b%k%}$(build_prompt_right_upper)"
 
 bureau_precmd () {
   _1SPACES=`get_space $_1LEFT $_1RIGHT`
@@ -242,7 +217,9 @@ bureau_precmd () {
   print -rP "$_1LEFT$_1SPACES$_1RIGHT"
 }
 
-PROMPT='%{%f%b%k%}$(build_prompt2) '
+# end bureau theme based code
+
+PROMPT='%{%f%b%k%}$(build_prompt_left_lower) '
 
 autoload -U add-zsh-hook
 add-zsh-hook precmd bureau_precmd
