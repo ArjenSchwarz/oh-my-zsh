@@ -10,7 +10,7 @@ site() {
 }
 
 serv() {
-    DIRS=("${(@f)$(find ~/projects -maxdepth 3 -mindepth 3 -type d -path "*/servers/*${1}" ! -iname ".*")}")
+    DIRS=("${(@f)$(find ~/projects -maxdepth 3 -mindepth 3 -type d -path "*/servers/*${1}*" ! -iname ".*")}")
     if (( ${#DIRS} == 1 )); then
         cd ${DIRS[1]}
     else
