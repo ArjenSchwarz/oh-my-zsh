@@ -1,21 +1,22 @@
 site() {
-    findandcd "/sites/*${1}" 3
+    fcd "/sites/*${1}" 3
 }
 
 serv() {
-    findandcd "/servers/*${1}" 3
+    fcd "/servers/*${1}" 3
 }
 
 int() {
-    findandcd "/internal/*${1}" 2
+    fcd "/internal/*${1}" 2
 }
 
-proj() {
-    findandcd $1 1
-}
-
-findandcd() {
-    DIRS=("${(@f)$(find ~/projects -mindepth ${2} -maxdepth ${2} -type d -path "*${1}*" ! -iname ".*")}")
+# Expects two parameters, the searchterm and the searchdepth. Searchdepth is 1 by default
+fcd() {
+    depth=1
+    if (($+2)); then
+        depth="${2}"
+    fi
+    DIRS=("${(@f)$(find ~/projects -mindepth ${depth} -maxdepth ${depth} -type d -path "*${1}*" ! -iname ".*")}")
     if (( ${#DIRS} == 1 )); then
         cd ${DIRS[1]}
     else
