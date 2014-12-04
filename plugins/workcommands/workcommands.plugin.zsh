@@ -1,22 +1,26 @@
 site() {
-    DIRS=("${(@f)$(find ~/projects -maxdepth 3 -mindepth 3 -type d -path "*/sites/*${1}*" ! -iname ".*")}")
-    if (( ${#DIRS} == 1 )); then
-        cd ${DIRS[1]}
-    else
-        echo 'Multiple sites found:'
-        print -C 1 $DIRS
-        cd ${DIRS[1]}
-    fi
+    findandcd "/sites/*${1}" 3
 }
 
 serv() {
-    DIRS=("${(@f)$(find ~/projects -maxdepth 3 -mindepth 3 -type d -path "*/servers/*${1}*" ! -iname ".*")}")
+    findandcd "/servers/*${1}" 3
+}
+
+int() {
+    findandcd "/internal/*${1}" 2
+}
+
+proj() {
+    findandcd $1 1
+}
+
+findandcd() {
+    DIRS=("${(@f)$(find ~/projects -mindepth ${2} -maxdepth ${2} -type d -path "*${1}*" ! -iname ".*")}")
     if (( ${#DIRS} == 1 )); then
         cd ${DIRS[1]}
     else
-        echo 'Multiple servers found:'
+        echo "Multiple results found:"
         print -C 1 $DIRS
         cd ${DIRS[1]}
     fi
 }
-
