@@ -6,6 +6,11 @@ ignoreimage() {
   echo "![alttext](http://assets2.nore.me/posts/$1)" | pbcopy;
 }
 
+# Just give me the Markdown'd URL in the clipboard
+blogimg() {
+  echo "![alttext](/img/posts/$1)" | pbcopy;
+}
+
 # Update the cloudformation stack with the default values
 blogcf() {
   echo "Updating blog cloudformation with default values"
