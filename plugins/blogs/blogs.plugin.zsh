@@ -30,3 +30,11 @@ blogcfdsl() {
   echo "Compiling blog cloudformation DSL into JSON"
   cd ~/projects/server_personal; cfndsl Cloudformation-template.rb | json_pp > cloudformation-generated.json
 }
+
+# Update access for my servers
+cfnip() {
+  externalip=`curl -s checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//'`
+  echo "Current IP is: ${externalip}\n"
+  echo "Updating Personal Access template with current IP address"
+  aws cloudformation update-stack --stack-name personal-access --use-previous-template --parameters ParameterKey=AccessIP,ParameterValue=${externalip}/32 --profile blogs
+}
